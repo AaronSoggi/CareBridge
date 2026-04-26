@@ -1,0 +1,100 @@
+html, body {
+  font-size: 14px;
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+
+}
+
+li i{
+  margin-right: 8px;
+}
+
+main{
+  flex: 1;
+  background-color: rgb(231, 237, 237);
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+  color: var(--bs-secondary-color);
+  text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+  text-align: start;
+}
+
+.table{
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  margin-top: 50px;
+  border-radius: 15px;
+  overflow: hidden;
+  border-collapse: collapse;
+}
+
+.btn-edit{
+  background-color: cadetblue;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 15px;
+  text-decoration: none;
+  margin-right: 10px;
+}
+
+.btn-delete{
+  background-color: rgb(196, 33, 33);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 15px;
+  text-decoration: none;
+  margin-right: 10px;
+}
+
+.btn-create{
+  background-color: cadetblue;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 15px;
+  text-decoration: none;
+}
+
+.btn-edit:hover{
+  cursor: pointer;
+  background-color: rgb(204, 182, 156);
+  transition: ease-in 0.3s;
+  color: black;
+}
+
+.btn-delete:hover{
+  cursor: pointer;
+  background-color: rgb(204, 182, 156);
+  transition: ease-in 0.3;
+  color: black;
+}
+
+.bi-clipboard-data{
+  font-size: 25px;
+}
+
+
+

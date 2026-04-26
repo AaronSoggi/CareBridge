@@ -1,0 +1,39 @@
+.app-layout{
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar-nav{
+    display: flex;
+    flex-direction: column;
+    background-color: rgb(32, 32, 31);
+    width: 250px;
+    padding: 20px;
+    min-height: 100vh;
+
+}
+
+.sidebar-nav ul{
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    gap: 20px;
+    padding: 0;
+    margin-top: 50px;
+}
+
+.sidebar-nav a{
+    text-decoration: none;
+    font-weight: 500;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: cadetblue;
+}
+
+.sidebar-nav h2{
+    color: cadetblue;
+}
+
+.sidebar-nav img{
+    height: 30px;
+    margin-right: 10px;
+}

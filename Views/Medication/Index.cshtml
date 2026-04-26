@@ -1,0 +1,31 @@
+@model IEnumerable<MediApp.DTOs.MedicationDto>
+
+<table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Dose</th>
+                <th>Instructions</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+                @foreach(var prop in Model)
+                {
+                    <tr>
+                        <td>@prop.Name</td>
+                        <td>@prop.Dose</td>
+                        <td>@prop.Notes</td>
+                        <td>@prop.StartDate.ToShortDateString()</td>
+                        <td>@prop.EndDate.ToShortDateString()</td>
+                        <td>
+                            <a class="btn-edit" asp-controller="Medication" asp-route-id="@prop.Id"  asp-action="Edit">Edit</a>
+                            <a class="btn-delete" asp-controller="Medication" asp-action="Delete">Delete</a>
+                            <a class="btn-create" asp-controller="Medication" asp-action="Create">Create</a>
+                        </td>   
+                    </tr> 
+                }
+        </tbody>
+</table>

@@ -1,0 +1,117 @@
+🏥 MediApp – Product Overview
+🎯 Purpose
+
+MediApp is a secure web-based medication management system that helps users:
+Track medications
+Schedule doses
+Monitor adherence
+Log health metrics
+Review medication history
+It is designed for individuals managing long-term prescriptions or multiple daily medications.
+
+👤 Target Users
+Individuals with chronic conditions
+People taking multiple prescriptions
+Users who struggle with medication consistency
+Caregivers managing medication for someone else (future feature)
+
+🔐 Core Principles
+Secure (user-based authentication)
+Simple UI
+Reliable scheduling logic
+Clear adherence reporting
+Scalable architecture
+
+🧱 Core Features (MVP)
+
+1️⃣ User Accounts
+What it does:
+Register / Login
+Each user only sees their own data
+Secure authentication via ASP.NET Identity
+
+Why it matters:
+Medication data is sensitive and must be user-isolated.
+
+2️⃣ Medication Management (CRUD)
+
+Users can:
+Add a medication
+Edit medication details
+Archive medications
+View active vs archived
+
+Fields include:
+Name
+Dosage (e.g., 20mg, 2 tablets)
+Instructions (e.g., “Take with food”)
+Start date
+End date (optional)
+Notes
+
+3️⃣ Scheduling System
+
+This is the core intelligence of the app.
+Users can define how a medication should be taken:
+Daily at specific times (e.g., 08:00 and 20:00)
+Specific days of week (Mon/Wed/Fri)
+Every X hours
+As-needed (no reminders)
+The system automatically generates upcoming dose events.
+
+4️⃣ Dose Tracking
+Each scheduled dose becomes a Dose Event.
+For each event, a user can:
+Mark as Taken
+Skip
+
+Let it become Missed
+
+(Later: Snooze)
+
+Each event stores:
+Scheduled time
+Actual action time
+Status
+
+5️⃣ Dashboard (Today View)
+
+The main page shows:
+Medications due now
+Upcoming doses
+Missed doses
+Completed doses today
+This gives immediate visibility.
+
+6️⃣ Adherence Monitoring
+The system calculates:
+Adherence % = (Taken / Total Scheduled) * 100
+Users can view:
+7-day adherence
+30-day adherence
+Per-medication adherence
+This gives measurable accountability.
+
+7️⃣ Logs & History
+
+Users can:
+View all past dose events
+Filter by date
+Filter by medication
+See action timestamps
+
+8️⃣ Health Metrics (Optional MVP)
+Users can manually log:
+Weight
+Blood pressure
+Blood sugar
+General notes
+Later, these can be visualised in charts.
+
+9️⃣ Export
+
+Users can export:
+Medication list
+Dose history
+Health metrics
+As CSV files.
