@@ -12,7 +12,7 @@ public static class MedicationSeeder
         var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         var dbContext = serviceProvider.GetRequiredService<ApplicationDbContext>();
 
-        var user = await userManager.FindByEmailAsync("test@hotmail.com");
+        var user = await userManager.FindByEmailAsync("fred@hotmail.com");
 
         if(user == null)
         {
@@ -29,7 +29,8 @@ public static class MedicationSeeder
                     Dose = 200,
                     Instructions = "take one a day",
                     StartDate = DateTime.Now,
-                    EndDate = new DateTime(2026, 03 , DateTime.DaysInMonth(2026, 03))
+                    EndDate = new DateTime(2026, 03 , DateTime.DaysInMonth(2026, 03)),
+                    UserId = user.Id
                 },
                 new Medication
                 {

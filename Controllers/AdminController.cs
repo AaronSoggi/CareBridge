@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using MediApp.Identity;
 using MediApp.Models;
 using MediApp.Services;
@@ -17,13 +18,15 @@ public class AdminController : Controller
     private readonly ILogger<AdminController> _logger;
     private readonly IPatientService _patientService;
     private readonly IDoctorService _doctorService;
+    private readonly IAdminService _adminService;
     public AdminController(UserManager<ApplicationUser> userManager, ILogger<AdminController> logger,
-     IPatientService patientService, IDoctorService doctorService)
+     IPatientService patientService, IDoctorService doctorService, IAdminService adminService)
     {
         _userManager = userManager;
         _logger = logger;
         _patientService = patientService;
         _doctorService = doctorService;
+        _adminService = adminService;
     }
 
     public IActionResult Dashboard()
@@ -56,7 +59,7 @@ public class AdminController : Controller
     }
 
     [HttpPost]
-    [Authorize(Roles = Roles.Admin)]
+    [Authorize]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> VerifyDoctor(string userId)
     {
@@ -84,8 +87,25 @@ public class AdminController : Controller
         return RedirectToAction(nameof(PendingDoctors));
     }
 
-    public IActionResult PendingDoctors()
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> PendingDoctors()
     {
-        return View();
+        var userId = _userManager.GetUserId(User);
+
+        if(userId == null)
+        {
+            _logger.LogWarning("Please ensure user is logged in before carrying out this request");
+            return Unauthorized();
+        }
+
+        var doctors = await _adminService.GetPendingDoctors();
+
+        if(!doctors.Any())
+        {
+            _logger.LogWarning("There doesnt seem to be any pending doctors");
+        }
+
+        return View(doctors);
     }
 }

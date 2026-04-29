@@ -1,0 +1,35 @@
+@using MediApp.DTOs
+@model UpdateMedicationDto
+
+<form class="form-layout" asp-action="Update" asp-controller="Medication" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div>
+        <label asp-for="Name"></label>
+        <input class="form-field" asp-for="Name" />
+    </div>
+
+    <div>
+        <label asp-for="Dose"></label>
+        <input class="form-field" asp-for="Dose" />
+    </div>
+
+    <div>
+        <label asp-for="Instructions"></label>
+        <input class="form-field" asp-for="Instructions" />
+    </div>
+
+    <div>
+        <label asp-for="StartDate"></label>
+        <input class="form-field" asp-for="StartDate" />
+    </div>
+
+    <div>
+        <label asp-for="EndDate"></label>
+        <input class="form-field" asp-for="EndDate" />
+        <span asp-validation-for="EndDate"></span>
+    </div>
+
+    <button class="btn-create" type="submit">Update</button>
+
+</form>

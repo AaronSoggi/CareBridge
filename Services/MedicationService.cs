@@ -98,12 +98,12 @@ public class MedicationService : IMedicationService
 
     public async Task<PagedResult<MedicationDto>> GetMedicationsAsync(string userId, int pageNumber, int pageSize)
     {
-        var cacheKey = $"medications:user:{userId}:page:{pageNumber}:size:{pageSize}";
+        // var cacheKey = $"medications:user:{userId}:page:{pageNumber}:size:{pageSize}";
 
-        if(_cache.TryGetValue(cacheKey, out PagedResult<MedicationDto>? medications))
-        {
-            return medications;
-        }
+        // if(_cache.TryGetValue(cacheKey, out PagedResult<MedicationDto>? medications))
+        // {
+        //     return medications;
+        // }
 
         var query = _dbContext.Medications
         .Where(i => i.UserId == userId)
@@ -125,11 +125,11 @@ public class MedicationService : IMedicationService
             TotalItemCount = count
         };
 
-        _cache.Set(cacheKey, result, new MemoryCacheEntryOptions
-        {
-            SlidingExpiration = TimeSpan.FromMinutes(5),
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
-        });
+        // _cache.Set(cacheKey, result, new MemoryCacheEntryOptions
+        // {
+        //     SlidingExpiration = TimeSpan.FromMinutes(5),
+        //     AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
+        // });
 
         return result;
 

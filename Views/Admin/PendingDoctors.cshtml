@@ -1,0 +1,40 @@
+@using Microsoft.AspNetCore.Mvc.RazorPages
+@using MediApp.Models
+@model IEnumerable<ApplicationUser>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>First name</th>
+            <th>Last name</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var user in Model)
+        {
+            <tr>
+                <td>@user.FirstName]</td>
+                <td>@user.LastName</td>
+                <td>
+                    <form method="post" asp-action="VerifyDoctor">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="userId" value="@user.Id" />
+
+                        @if(TempData["Success"] != null)
+                        {
+                            <p style="color: green;">@TempData["Success"]</p>
+                        }
+                        else
+                        {
+                            <p style="color: red;">@TempData["Error"]</p>
+                        }
+
+                        <button class="btn-create" type="submit">Verify Doctor</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
