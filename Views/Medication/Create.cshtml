@@ -1,0 +1,34 @@
+@using MediApp.DTOs
+@model CreateMedicationDto
+
+<form method="post" asp-action="Create" asp-controller="Medication">
+@Html.AntiForgeryToken()
+
+<div>
+    <label asp-for="Name"></label>
+    <input class="form-field" asp-for="Name" />
+</div>
+
+<div>
+    <label asp-for="Dose"></label>
+    <input class="form-field" asp-for="Dose" />
+</div>
+
+<div>
+    <label asp-for="Instructions"></label>
+    <input class="form-field" asp-for="Instructions" />
+</div>
+
+<div>
+    <label asp-for="StartDate"></label>
+    <input class="form-field" asp-for="StartDate" />
+</div>
+
+<div>
+    <label asp-for="EndDate"></label>
+    <input class="form-field" asp-for="EndDate" />
+</div>
+
+<button class="btn-create" type="submit">Create Medication</button>
+
+</form>

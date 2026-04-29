@@ -42,6 +42,9 @@ namespace MediApp.Migrations
                     b.Property<string>("FirstName")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("LastName")
                         .HasColumnType("TEXT");
 

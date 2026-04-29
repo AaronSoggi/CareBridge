@@ -69,7 +69,7 @@ public static class IdentitySeeder
                 PhoneNumber = "07000000000"
             };
 
-            var result = await user.CreateAsync(applicationUser, "Password123");
+            var result = await user.CreateAsync(applicationUser, "Password123!");
             if (!result.Succeeded)
             {
                 var errors = string.Join(",", result.Errors.Select(e =>e.Description));

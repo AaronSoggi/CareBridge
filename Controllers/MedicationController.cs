@@ -51,9 +51,15 @@ public class MedicationController : Controller
 
         return View(medicationListDto);
     }
+    [HttpGet]
+    [Authorize]
+    public IActionResult Create()
+    {
+        return View(new CreateMedicationDto());
+    }
 
     [HttpPost]
-    [Authorize(Roles = Roles.MedicalStaff)]
+    [Authorize]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateMedicationDto dto)
     {
@@ -108,8 +114,8 @@ public class MedicationController : Controller
 
     }
 
-    [HttpPut]
-    [Authorize(Roles = Roles.Patient)]
+    [HttpPost]
+    [Authorize]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Update(UpdateMedicationDto dto)
     {
@@ -169,6 +175,6 @@ public class MedicationController : Controller
         _dbcontext.Medications.Remove(medication);
         await _dbcontext.SaveChangesAsync();
         TempData["Success"] = "Medication has been removed succesfully";
-        return RedirectToAction("Index", "Home");
+        return RedirectToAction(nameof(Index));
     }
 }

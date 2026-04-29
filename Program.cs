@@ -37,6 +37,8 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(
 
 builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddScoped<IDoctorService, DoctorService>();
+builder.Services.AddScoped<IMedicationService, MedicationService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
 
 builder.Services.AddAutoMapper(cfg =>
 {

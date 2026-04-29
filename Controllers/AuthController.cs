@@ -48,19 +48,11 @@ public class AuthController : Controller
             return View(dto);
         }
 
-        var user = await _userManager.FindByEmailAsync(dto.Email);
-
-        if(user == null)
-        {
-            ModelState.AddModelError("", "Something went wrong, please check login details and try again");
-            return View(dto);
-        }
-
-        var result = await _signInManager.PasswordSignInAsync(user, dto.Password, false, false );
+        var result = await _signInManager.PasswordSignInAsync(dto.Email, dto.Password, false, false );
 
         if (!result.Succeeded)
         {
-            ModelState.AddModelError("", "Something went wrong, please check credentials and try again");
+            ModelState.AddModelError("", "Invalid email or password.");
             return View(dto);
         }
 
@@ -73,7 +65,7 @@ public class AuthController : Controller
     public async Task<IActionResult> Logout()
     {
         await _signInManager.SignOutAsync();
-        return RedirectToAction("Login","Auth");
+        return RedirectToAction("Index","Home");
     }
 
     [HttpPost]

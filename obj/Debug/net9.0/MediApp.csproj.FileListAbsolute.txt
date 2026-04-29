@@ -36,17 +36,24 @@
 /Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Microsoft.EntityFrameworkCore.SqlServer.dll
 /Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Microsoft.Extensions.Caching.Abstractions.dll
 /Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Microsoft.Extensions.Caching.Memory.dll
+/Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Microsoft.Extensions.Configuration.dll
 /Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Microsoft.Extensions.Configuration.Abstractions.dll
+/Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Microsoft.Extensions.Configuration.Binder.dll
 /Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Microsoft.Extensions.DependencyInjection.dll
 /Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll
 /Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Microsoft.Extensions.DependencyModel.dll
+/Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Microsoft.Extensions.Diagnostics.dll
+/Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Microsoft.Extensions.Diagnostics.Abstractions.dll
 /Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Microsoft.Extensions.FileProviders.Abstractions.dll
 /Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Microsoft.Extensions.FileProviders.Embedded.dll
+/Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Microsoft.Extensions.Http.dll
+/Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Microsoft.Extensions.Http.Polly.dll
 /Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Microsoft.Extensions.Identity.Core.dll
 /Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Microsoft.Extensions.Identity.Stores.dll
 /Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Microsoft.Extensions.Logging.dll
 /Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Microsoft.Extensions.Logging.Abstractions.dll
 /Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Microsoft.Extensions.Options.dll
+/Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Microsoft.Extensions.Options.ConfigurationExtensions.dll
 /Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Microsoft.Extensions.Primitives.dll
 /Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Microsoft.Identity.Client.dll
 /Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Microsoft.Identity.Client.Extensions.Msal.dll
@@ -59,6 +66,10 @@
 /Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Microsoft.SqlServer.Server.dll
 /Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Microsoft.Win32.SystemEvents.dll
 /Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Mono.TextTemplating.dll
+/Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Newtonsoft.Json.dll
+/Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Polly.dll
+/Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Polly.Core.dll
+/Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/Polly.Extensions.Http.dll
 /Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/SQLitePCLRaw.batteries_v2.dll
 /Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/SQLitePCLRaw.core.dll
 /Users/aaronsoggi/Documents/Projects/MediApp/bin/Debug/net9.0/SQLitePCLRaw.provider.e_sqlite3.dll
@@ -186,6 +197,7 @@
 /Users/aaronsoggi/Documents/Projects/MediApp/obj/Debug/net9.0/MediApp.MvcApplicationPartsAssemblyInfo.cache
 /Users/aaronsoggi/Documents/Projects/MediApp/obj/Debug/net9.0/MediApp.RazorAssemblyInfo.cache
 /Users/aaronsoggi/Documents/Projects/MediApp/obj/Debug/net9.0/MediApp.RazorAssemblyInfo.cs
+/Users/aaronsoggi/Documents/Projects/MediApp/obj/Debug/net9.0/MediApp.sourcelink.json
 /Users/aaronsoggi/Documents/Projects/MediApp/obj/Debug/net9.0/rjimswa.dswa.cache.json
 /Users/aaronsoggi/Documents/Projects/MediApp/obj/Debug/net9.0/rjsmrazor.dswa.cache.json
 /Users/aaronsoggi/Documents/Projects/MediApp/obj/Debug/net9.0/rjsmcshtml.dswa.cache.json
@@ -256,7 +268,6 @@
 /Users/aaronsoggi/Documents/Projects/MediApp/obj/Debug/net9.0/compressed/yfc7ypekbg-mlv21k5csn.gz
 /Users/aaronsoggi/Documents/Projects/MediApp/obj/Debug/net9.0/compressed/4671u7lrgv-6unc14flg1.gz
 /Users/aaronsoggi/Documents/Projects/MediApp/obj/Debug/net9.0/compressed/23ota2c673-1psk1num44.gz
-/Users/aaronsoggi/Documents/Projects/MediApp/obj/Debug/net9.0/compressed/0y0p07o4v7-6lm6j227ha.gz
 /Users/aaronsoggi/Documents/Projects/MediApp/obj/Debug/net9.0/compressed/3b9var6sjx-61n19gt1b8.gz
 /Users/aaronsoggi/Documents/Projects/MediApp/obj/Debug/net9.0/compressed/87ow2sukix-xtxxf3hu2r.gz
 /Users/aaronsoggi/Documents/Projects/MediApp/obj/Debug/net9.0/compressed/z2uafex14x-bqjiyaj88i.gz
@@ -330,3 +341,4 @@
 /Users/aaronsoggi/Documents/Projects/MediApp/obj/Debug/net9.0/MediApp.pdb
 /Users/aaronsoggi/Documents/Projects/MediApp/obj/Debug/net9.0/MediApp.genruntimeconfig.cache
 /Users/aaronsoggi/Documents/Projects/MediApp/obj/Debug/net9.0/ref/MediApp.dll
+/Users/aaronsoggi/Documents/Projects/MediApp/obj/Debug/net9.0/compressed/0y0p07o4v7-fpjwh8xuh6.gz

@@ -12,15 +12,28 @@
     <link rel="stylesheet" href="~/css/Components/dashboard.css" asp-append-version="true"/>
 </head>
 <body>
-
     <div class="app-layout">
+
         <partial name="_Sidebar"></partial>
 
-        <main role="main" class="pb-3">
-             <div class="container">
-                @RenderBody()
-            </div>
-        </main>
+        <div class="main-area">
+            <header class="top-bar">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <form asp-action="Logout" asp-controller="Auth" method="post">
+                        @Html.AntiForgeryToken()
+                        <button class="btn-logout" type="submit">Logout</button>
+                    </form>
+                }
+            </header>
+
+            <main role="main" class="pb-3">
+                <div class="container">
+                    @RenderBody()
+                </div>
+            </main>
+        </div>
+
     </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

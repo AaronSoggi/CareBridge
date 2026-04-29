@@ -14,7 +14,7 @@ public class MappingProfile : Profile
         .ForMember(dest => dest.UserId, opt => opt.Ignore());
 
         CreateMap<UpdateMedicationDto, Medication>()
-        .ForMember(dest => dest.Id, opt => opt.Ignore());
+        .ForMember(dest => dest.Id, opt => opt.Ignore()).ReverseMap();
         
         CreateMap<MedicationDto, Medication>();
 

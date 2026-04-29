@@ -14,9 +14,9 @@ public class PatientController : Controller
     private readonly ILogger<PatientController> _logger;
     private readonly IPatientService _patientService;
 
-    private readonly IOptions<MedicationApiSettings> _apiSettings;
+    private readonly IOptions<MedicationClientSettings> _apiSettings;
     public PatientController(UserManager<ApplicationUser> userManager, ILogger<PatientController> logger,
-    IPatientService patientService, IOptions<MedicationApiSettings> apiSettings)
+    IPatientService patientService, IOptions<MedicationClientSettings> apiSettings)
     {
         _userManager = userManager;
         _logger = logger;
