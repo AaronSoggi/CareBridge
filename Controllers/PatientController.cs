@@ -1,6 +1,8 @@
 using MediApp.Configuration;
+using MediApp.Identity;
 using MediApp.Models;
 using MediApp.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -23,4 +25,16 @@ public class PatientController : Controller
         _patientService = patientService;
         _apiSettings = apiSettings;
     }
+
+    [HttpGet]
+    [Authorize(Roles = Roles.Admin)]
+    public async Task<IActionResult> GetPatients(int pageNumber = 1, int pageSize = 10)
+    {
+        var patients = await _patientService.GetPatientsAsync(pageNumber, pageSize);        
+        return View(patients);
+    }
+
+    // we want to be able to create a patient/ delete a patient and update a patient.
+    // we want to list all the patients on the index.cshtml - but we want to also include some other information 
+    // we want to include the doctor for each patient and also have a appointments button which will open a new page.
 }

@@ -1,14 +1,13 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MediApp.Data;
-using AutoMapper;
 using MediApp.Models;
 using MediApp.Mapping;
-using Microsoft.CodeAnalysis.Options;
 using MediApp.Identity;
-using Microsoft.Extensions.Options;
 using MediApp.Services;
-using MediApp.Configuration;
+using MediApp.Validators;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using MediApp.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +21,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddHttpClient();
 
+builder.Services.AddHttpClients(builder.Configuration);
 
 builder.Services.AddDefaultIdentity<ApplicationUser>(
     options =>
@@ -35,6 +35,20 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
+builder.Services.Configure<IdentityOptions>(options =>
+{
+   options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(5);
+   options.Lockout.MaxFailedAccessAttempts = 4; 
+   options.Lockout.AllowedForNewUsers = true;
+   
+});
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+   options.SlidingExpiration = true;
+   options.ExpireTimeSpan = TimeSpan.FromMinutes(10);
+});
+
 builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddScoped<IDoctorService, DoctorService>();
 builder.Services.AddScoped<IMedicationService, MedicationService>();
@@ -46,6 +60,8 @@ builder.Services.AddAutoMapper(cfg =>
 });
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<MedicationValidator>();
 
 builder.Services.AddAuthorization(options =>
 AuthorizationPolicies.GeneratePolicies(options));

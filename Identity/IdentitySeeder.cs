@@ -1,97 +1,102 @@
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
+using Azure.Core;
 using MediApp.Models;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualBasic;
 
 namespace MediApp.Identity;
 
+// creating roles
+// creating users
+// adding users to specific roles
+// for doctors its adding the Isverified claim
 public static class IdentitySeeder
 {
-    public async static Task SeedIdentities(IServiceProvider serviceProvider)
+    public async static Task SeedIdentities(IServiceProvider provider)
     {
-        var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-        var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        // services that are required for seeding
+        var userManager = provider.GetRequiredService<UserManager<ApplicationUser>>();
+        var roleManager = provider.GetRequiredService<RoleManager<IdentityRole>>();
 
-        string[] roles = 
+        string[] roles =
         {
-          Roles.Admin,
-          Roles.Doctor,
-          Roles.Patient
+            Roles.Admin,
+            Roles.Doctor,
+            Roles.Patient
         };
 
         foreach(var role in roles)
         {
             if(!await roleManager.RoleExistsAsync(role))
             {
-               var result = await roleManager.CreateAsync(new IdentityRole(role));
+                var result = await roleManager.CreateAsync(new IdentityRole(role));
 
                 if (!result.Succeeded)
                 {
-                    var errors = string.Join(",", result.Errors.Select(e => e.Description));
-                    throw new Exception($"something when wrong when attempting to add a role {errors}");
+                    var errors = string.Join(",", result.Errors.Select(i => i.Description));
+                    throw new Exception($"something wentwrong when adding a role: {errors}");
                 }
             }
         }
 
-        var patient = await SeedUser(userManager, "Freddy", "Fredz", "fred@hotmail.com", Roles.Patient);
-        var doctor = await SeedUser(userManager, "Monica", "Kumar", "monica@hotmai.com", Roles.Doctor);
+        var patient = await SeedUser(userManager, "Aaron", "kumar", "soggi92@hotmail.co.uk", Roles.Patient);
+        var doctor = await SeedUser(userManager, "Aaron", "Soggi", "soggi@hotmail.co.uk", Roles.Doctor);
 
         var claims = await userManager.GetClaimsAsync(doctor);
 
-        if(!claims.Any(i => i.Type.Equals(Policies.VerifiedDoctor)))
+        if(!claims.Any(i => i.Type == "IsVerified"))
         {
-            var result = await userManager.AddClaimAsync(doctor, new Claim(Policies.VerifiedDoctor, "false"));
+            var result =  await userManager.AddClaimAsync(doctor, new Claim("IsVerified", "false"));
 
             if (!result.Succeeded)
             {
-                var errors = string.Join(",", result.Errors.Select(e => e.Description));
-                throw new Exception($"something went wront when attempting to add a claim to the user {errors}");
+                var errors = string.Join(",", result.Errors.Select(i => i.Description));
+                throw new Exception($"Failed to add new claim {errors}");
             }
         }
     }
 
-    private static async Task<ApplicationUser> SeedUser(UserManager<ApplicationUser> user, 
-    string firstName, string lastName, string email, string role)
+    public async static Task<ApplicationUser> SeedUser(UserManager<ApplicationUser> userManager, string firstName, string lastName, string email, string role)
     {
-        var applicationUser = await user.FindByEmailAsync(email);
+        var user = await userManager.FindByEmailAsync(email);
 
-        if(applicationUser == null)
+        if(user == null)
         {
-            applicationUser = new ApplicationUser
+            user = new ApplicationUser
             {
-                FirstName = firstName,
-                LastName = lastName,
-                Created = DateTime.UtcNow,
-                UserName = email,
-                Email = email,
-                PhoneNumber = "07000000000"
+              FirstName = firstName,
+              LastName = lastName,
+              Email = email,
+              UserName = email,
+              Created = DateTime.UtcNow,
+              PhoneNumber = "0000"
             };
 
-            var result = await user.CreateAsync(applicationUser, "Password123!");
-            if (!result.Succeeded)
-            {
-                var errors = string.Join(",", result.Errors.Select(e =>e.Description));
-                throw new Exception($"Something went wrong {errors}");
-            }
-        }
-
-        //Checking if user is in a role
-        var isInRole = await user.IsInRoleAsync(applicationUser,role);
-
-        if (!isInRole)
-        {
-            var result = await user.AddToRoleAsync(applicationUser,role);
+            var result = await userManager.CreateAsync(user, "Password123!");
 
             if (!result.Succeeded)
             {
                 var errors = string.Join(",", result.Errors.Select(e => e.Description));
-                throw new Exception($"sommething went wrong when assigning user to role {errors}");
+                throw new Exception($"failed to create user {errors}");
             }
         }
 
-        return applicationUser;
-        
+        var inRole = await userManager.IsInRoleAsync(user, role);
+
+        if (!inRole)
+        {
+            var result = await userManager.AddToRoleAsync(user, role);
+
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(",", result.Errors.Select(e => e.Description));
+                throw new Exception($"unable to assign role{errors}");
+            }
+        }
+
+        return user;
     }
 }

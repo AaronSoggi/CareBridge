@@ -155,16 +155,16 @@ public class MedicationController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id)
     {
-        var userId = _userManager.GetUserId(User);
+        var patientId = _userManager.GetUserId(User);
 
-        if(userId == null)
+        if(patientId == null)
         {
             _logger.LogWarning("Unable to delete medication when user isnt signed in");
             return Forbid();
         }
 
         var medication = await _dbcontext.Medications
-        .FirstOrDefaultAsync(i => i.Id == id && i.UserId == userId);
+        .FirstOrDefaultAsync(i => i.Id == id && i.PatientId.ToString() == patientId);
 
         if(medication == null)
         {

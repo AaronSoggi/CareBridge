@@ -3,6 +3,7 @@ using AutoMapper.QueryableExtensions;
 using MediApp.Data;
 using MediApp.DTOs;
 using MediApp.Models;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -28,7 +29,7 @@ public class MedicationService : IMedicationService
     {
         try
         {
-            var existingMedication = await _dbContext.Medications.FirstOrDefaultAsync(t => t.Name == dto.Name && t.UserId == userId);
+            var existingMedication = await _dbContext.Medications.FirstOrDefaultAsync(t => t.Name == dto.Name);
 
             if(existingMedication != null)
             {
@@ -37,7 +38,7 @@ public class MedicationService : IMedicationService
             }
 
             var medication = _mapper.Map<Medication>(dto);
-            medication.UserId = userId;
+            //medication.UserId = userId;
 
             await _dbContext.Medications.AddAsync(medication);
             await _dbContext.SaveChangesAsync();
@@ -56,7 +57,7 @@ public class MedicationService : IMedicationService
     {
         try
         {
-            var medication = await _dbContext.Medications.FirstOrDefaultAsync(t => t.Id == dto.Id && t.UserId == userId);
+            var medication = await _dbContext.Medications.FirstOrDefaultAsync(t => t.Id == dto.Id);
 
             if(medication == null)
             {
@@ -83,7 +84,7 @@ public class MedicationService : IMedicationService
     public async Task<UpdateMedicationDto?> GetUpdateMedicationAsync(string userId, int medicationId)
     {
 
-        var medication = await _dbContext.Medications.FirstOrDefaultAsync(i => i.Id == medicationId && i.UserId == userId);
+        var medication = await _dbContext.Medications.FirstOrDefaultAsync(i => i.Id == medicationId && i.PatientId.ToString() == userId);
 
         if(medication == null)
         {
@@ -98,15 +99,14 @@ public class MedicationService : IMedicationService
 
     public async Task<PagedResult<MedicationDto>> GetMedicationsAsync(string userId, int pageNumber, int pageSize)
     {
-        // var cacheKey = $"medications:user:{userId}:page:{pageNumber}:size:{pageSize}";
+        var cacheKey = $"medications:user:{userId}:page:{pageNumber}:size:{pageSize}";
 
-        // if(_cache.TryGetValue(cacheKey, out PagedResult<MedicationDto>? medications))
-        // {
-        //     return medications;
-        // }
+        if(_cache.TryGetValue(cacheKey, out PagedResult<MedicationDto>? medications))
+        {
+             return medications;
+        }
 
         var query = _dbContext.Medications
-        .Where(i => i.UserId == userId)
         .OrderBy(i => i.Name);
 
         var count = await query.CountAsync();
@@ -125,13 +125,15 @@ public class MedicationService : IMedicationService
             TotalItemCount = count
         };
 
-        // _cache.Set(cacheKey, result, new MemoryCacheEntryOptions
-        // {
-        //     SlidingExpiration = TimeSpan.FromMinutes(5),
-        //     AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
-        // });
+        _cache.Set(cacheKey, result, new MemoryCacheEntryOptions
+        {
+             SlidingExpiration = TimeSpan.FromMinutes(5),
+             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
+        });
 
         return result;
+
+       
 
     }
 }

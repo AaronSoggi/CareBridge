@@ -4,6 +4,7 @@ using MediApp.Data;
 using MediApp.DTOs;
 using MediApp.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace MediApp.Services;
 
@@ -11,40 +12,40 @@ public class PatientService : IPatientService
 {
     private readonly ApplicationDbContext _Dbcontext;
     private readonly IMapper _mapper;
-    public PatientService(ApplicationDbContext Dbcontext, IMapper mapper)
+
+    private readonly IMemoryCache _cache;
+    public PatientService(ApplicationDbContext Dbcontext, IMapper mapper, IMemoryCache cache)
     {
         _Dbcontext = Dbcontext;
         _mapper = mapper;
+        _cache = cache;
+
     }
 
-    public async Task<List<PatientInfoDto>> GetPatientInfo()
+    public async Task<List<PatientDto>> GetPatientsAsync(int pageNumber, int pageSize)
     {
-        // as this is readonly information we should just use projectTo
-        return await _Dbcontext.Medications
-        .Where(i => i.EndDate > DateTime.UtcNow)
-        .OrderBy(i => i.Name)
-        .ProjectTo<PatientInfoDto>(_mapper.ConfigurationProvider)
+        var cacheKey = $"patientList:PageNumber:{pageNumber}:PageSize{pageSize}";
+
+        if(_cache.TryGetValue(cacheKey, out List<PatientDto>? patients))
+        {
+            return patients;
+        }
+        
+
+        var dto = await _Dbcontext.Patients
+        .OrderBy(i => i.ApplicationUser.FirstName)
+        .Skip((pageNumber - 1) * pageSize)
+        .Take(pageSize)
+        .ProjectTo<PatientDto>(_mapper.ConfigurationProvider)
         .ToListAsync();
 
-    }
+        _cache.Set(cacheKey, dto, new MemoryCacheEntryOptions
+        {
+            SlidingExpiration = TimeSpan.FromMinutes(5),
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
+        });
 
-    // Get all users that havent been approved and their account was created over a year ago
-    public async Task<List<ApplicationUser>> GetUnapprovedUsers()
-    {
-        return await _Dbcontext.Users
-        .Include(i => i.Medications)
-        .Include(i => i.Profile)
-            .Where(i => i.Profile != null 
-            && !i.Profile.IsApproved 
-            && i.Created > DateTime.Now.AddYears(-1))
-            .ToListAsync();
-    }
-
-    public async Task<List<Medication>> GetMedicationsHighDose()
-    {
-        return await _Dbcontext.Medications
-        .Where(i => i.Dose > 200 
-        && i.EndDate > DateTime.UtcNow.AddYears(1))
-        .OrderBy(i => i.Name).ToListAsync();
+        return dto;
+        
     }
 }

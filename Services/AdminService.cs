@@ -18,7 +18,7 @@ public class AdminService : IAdminService
         
     }
 
-    public async Task<List<ApplicationUser>> GetPendingDoctors() 
+    public async Task<List<ApplicationUser>> GetPendingDoctors()
     {
         var pendingDoctors = new List<ApplicationUser>();
 
@@ -37,9 +37,7 @@ public class AdminService : IAdminService
                     pendingDoctors.Add(doctor);
                 }
             }
-            
         }
         return pendingDoctors;
     }
-
 }
