@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace MediApp.Seeders;
-
+// creating medications for 
 public static class MedicationSeeder
 {
     public async static Task SeedMedications(IServiceProvider serviceProvider)
@@ -18,8 +18,15 @@ public static class MedicationSeeder
         {
             throw new Exception($"user does not exist{user}");
         }
+
+        // Get the patient linked to this user
+        var patient = await dbContext.Patients
+            .FirstOrDefaultAsync(p => p.ApplicationUserId == user.Id);
+
+        if (patient == null)
+            throw new Exception("Patient does not exist for this user");
         
-        if(!await dbContext.Medications.AnyAsync(i => i.UserId == user.Id))
+        if(!await dbContext.Medications.AnyAsync(i => i.PatientId == patient.Id))
         {
             var medications = new List<Medication>()
             {
@@ -30,7 +37,7 @@ public static class MedicationSeeder
                     Instructions = "take one a day",
                     StartDate = DateTime.Now,
                     EndDate = new DateTime(2026, 03 , DateTime.DaysInMonth(2026, 03)),
-                    UserId = user.Id
+                    PatientId = patient.Id
                 },
                 new Medication
                 {
@@ -39,7 +46,7 @@ public static class MedicationSeeder
                     Instructions = "Take two daily",
                     StartDate = DateTime.Now,
                     EndDate = new DateTime(2026, 03, DateTime.DaysInMonth(2026,03)),
-                    UserId = user.Id
+                    PatientId = patient.Id
                 }, 
                 new Medication
                 {
@@ -48,7 +55,7 @@ public static class MedicationSeeder
                     Instructions = "Take half daily",
                     StartDate = DateTime.Now,
                     EndDate = new DateTime(2026, 03, DateTime.DaysInMonth(2026,03)),
-                    UserId = user.Id
+                    PatientId = patient.Id
                 }, 
                 new Medication
                 {
@@ -57,7 +64,7 @@ public static class MedicationSeeder
                     Instructions = "Take ten daily",
                     StartDate = DateTime.Now,
                     EndDate = new DateTime(2026, 03, DateTime.DaysInMonth(2026,03)),
-                    UserId = user.Id
+                    PatientId = patient.Id
                 }
             };
 
@@ -66,3 +73,5 @@ public static class MedicationSeeder
         }
     }
 }
+
+

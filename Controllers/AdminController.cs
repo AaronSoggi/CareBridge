@@ -1,6 +1,8 @@
+using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using MediApp.DTOs;
 using MediApp.Identity;
 using MediApp.Models;
 using MediApp.Services;
@@ -12,6 +14,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace MediApp.Controllers;
 
+[Route("admin")]
 public class AdminController : Controller
 {
     private readonly UserManager<ApplicationUser> _userManager;
@@ -19,47 +22,44 @@ public class AdminController : Controller
     private readonly IPatientService _patientService;
     private readonly IDoctorService _doctorService;
     private readonly IAdminService _adminService;
+
+    private readonly IProductClient _productClient;
     public AdminController(UserManager<ApplicationUser> userManager, ILogger<AdminController> logger,
-     IPatientService patientService, IDoctorService doctorService, IAdminService adminService)
+     IPatientService patientService, IDoctorService doctorService, IAdminService adminService,
+     IProductClient productClient)
     {
         _userManager = userManager;
         _logger = logger;
         _patientService = patientService;
         _doctorService = doctorService;
         _adminService = adminService;
+        _productClient = productClient;
     }
+
+    // public async Task<IActionResult> GetPatientInfo()
+    // {
+    //     var user = _userManager.GetUserId(User);
+
+    //     if(user == null)
+    //     {
+    //         _logger.LogWarning("Please can you ensure that user is logged in before carrying out this request");
+    //         return Unauthorized();
+    //     }
+
+    //     var patientInfo = await _patientService.GetPatientInfoAsync();
+
+    //     return View(patientInfo);
+    // }
 
     public IActionResult Dashboard()
     {
         return View();  
     }
 
-    // dont wanna add authorize for testin purposes
-    [HttpGet]
-    public async Task<IActionResult> PatientInfo()
-    {
-        // we want to fetch the medication and user data from the database and then return it to the view
-        var userId = _userManager.GetUserId(User);
 
-        if(userId == null)
-        {
-            _logger.LogWarning("Please make sure user is logged in before carrying out this request");
-            return Unauthorized();
-        }
-
-        var patientinfo = await _patientService.GetPatientInfo();
-
-        if(patientinfo == null)
-        {
-            _logger.LogWarning("Unable to retrieve data from the database");
-            return NotFound();
-        }
-
-       return View(patientinfo); 
-    }
-
+    //VerifyDoctor endpoint
     [HttpPost]
-    [Authorize]
+    [Authorize(Roles = Roles.Admin)]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> VerifyDoctor(string userId)
     {
@@ -67,8 +67,8 @@ public class AdminController : Controller
 
         if(user == null)
         {
-            _logger.LogWarning("Please ensure user is logged in before making this request");
-            return Unauthorized();         
+            _logger.LogWarning("Please ensure that user is logged in before carrying out the request");
+            return Unauthorized();
         }
 
         var result = await _doctorService.VerifyDoctorAsync(userId);
@@ -77,8 +77,10 @@ public class AdminController : Controller
         {
             if(result.NotFound)
             {
+                _logger.LogWarning("User could not be found");
                 return NotFound();
             }
+
             TempData["Error"] = result.Message;
             return RedirectToAction(nameof(PendingDoctors));
         }
@@ -87,25 +89,57 @@ public class AdminController : Controller
         return RedirectToAction(nameof(PendingDoctors));
     }
 
+
     [HttpGet]
-    [Authorize]
     public async Task<IActionResult> PendingDoctors()
     {
         var userId = _userManager.GetUserId(User);
 
         if(userId == null)
         {
-            _logger.LogWarning("Please ensure user is logged in before carrying out this request");
+            _logger.LogWarning("unable to carry our this request as the user is not signed in");
             return Unauthorized();
         }
 
-        var doctors = await _adminService.GetPendingDoctors();
+        var pendingDoctors = await _adminService.GetPendingDoctors();
 
-        if(!doctors.Any())
+        if (!pendingDoctors.Any())
         {
-            _logger.LogWarning("There doesnt seem to be any pending doctors");
+            _logger.LogWarning("There doesnt seem to be any doctors pending in the system");
         }
 
-        return View(doctors);
+        return View(pendingDoctors);
     }
+
+
+    [HttpGet]
+    [AllowAnonymous]
+    [Route("get-product/{id}")]
+    public async Task<IActionResult> GetProductAsync(int id)
+    {
+        var result = await _productClient.GetAsync(id);
+        
+        if(result == null)
+        {
+            _logger.LogWarning("Unable to fetch the specified product");
+            return NotFound();
+        }   
+
+        var product = new ProductDto
+        {
+            Id = result.Id,
+            Title = result.Title,
+            Description = result.Description,
+            Category = result.Category,
+            Price = result.Price,
+            DiscountPercentage = result.DiscountPercentage,
+            Rating = result.Rating,
+            Tags = result.Tags         
+        };
+
+        return Json(product);   
+            
+    }
+
+    // here we need to be able to create/update and delete users. these can be admin/doctor or patient.
 }

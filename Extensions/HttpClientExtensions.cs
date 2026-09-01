@@ -7,12 +7,16 @@ using Polly.Extensions.Http;
 using Polly;
 using System.Net;
 using System.Threading.Tasks;
+using Azure.Core;
+using Microsoft.AspNetCore.Mvc;
+using MediApp.Models;
+using Microsoft.CodeAnalysis.Options;
 
 namespace MediApp.Extensions;
 
 public static class HttpClientExtensions
 {
-    public static IServiceCollection AddHttpClients(IServiceCollection services, IConfiguration config)
+    public static IServiceCollection AddHttpClients(this IServiceCollection services, IConfiguration config)
     {
         services.Configure<MedicationClientSettings>(config.GetSection("HttpClients:MedicationApi"));
 
@@ -29,7 +33,50 @@ public static class HttpClientExtensions
 
         });
 
+        //Product client
+        services.Configure<ProductClientSettings>(config.GetSection("HttpClients:ProductApi"));
+
+        services.AddHttpClient<IProductClient, ProductClient>((sg, client) =>
+        {
+           var config = sg.GetRequiredService<IOptions<ProductClientSettings>>().Value;
+           client.BaseAddress = new Uri(config.BaseUrl);
+           client.Timeout = TimeSpan.FromSeconds(config.Timeout);
+           client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        }).AddPolicyHandler((sp, request) =>
+        {
+            var logger = sp.GetRequiredService<ILogger<ProductClient>>();
+            return WaitAndRetryPolicy(logger);
+        });
+
+        services.Configure<MedicationClientSettings>(config.GetSection("HttpClients:MedicationApi"));
+
+        services.AddHttpClient<IMedicationClient, MedicationClient>((sg, client) =>
+        {
+            var service = sg.GetRequiredService<IOptions<MedicationClientSettings>>().Value;
+            client.BaseAddress = new Uri(service.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(service.TimeoutSeconds);
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application.json"));
+        }).AddPolicyHandler((sp, client) =>
+        {
+            var logger = sp.GetRequiredService<ILogger<MedicationClient>>();
+            return WaitAndRetryPolicy(logger);
+        });
+        
         return services;
+    }
+    
+    public static IAsyncPolicy<HttpResponseMessage> WaitAndRetryPolicy(ILogger logger)
+    {
+        return HttpPolicyExtensions
+        .HandleTransientHttpError()
+        .OrResult(t => t.StatusCode == HttpStatusCode.TooManyRequests)
+        .WaitAndRetryAsync(retryCount: 3, sleepDurationProvider: attempt 
+        => TimeSpan.FromSeconds(Math.Pow(2, attempt)), onRetry: (result, duration, attempt, context) =>
+        {
+            var outcome = result.Exception.Message ?? result.Result.StatusCode.ToString() ?? "unknown";
+
+            logger.LogWarning($"Response {outcome}, sleep duration: {duration}, on attempt {attempt}: Operation Key {context.OperationKey} ");   
+        });
     }
 
     public static IAsyncPolicy<HttpResponseMessage> AddRetryPolicy(ILogger logger)
@@ -37,14 +84,13 @@ public static class HttpClientExtensions
         return HttpPolicyExtensions
         .HandleTransientHttpError()
         .OrResult(t => t.StatusCode == HttpStatusCode.TooManyRequests)
-        .WaitAndRetryAsync(3, sleepDurationProvider: 
-        attempt => 
-        TimeSpan.FromSeconds(Math.Pow(2, attempt)), 
-        onRetry: (result, timespan, retryCount, context) =>
+        .WaitAndRetryAsync(retryCount: 3, sleepDurationProvider: attempt =>
+        TimeSpan.FromSeconds(Math.Pow(2, attempt)), onRetry: (result,duration, attempt, context) =>
         {
-            var reason = result.Exception?.Message ?? result.Result.StatusCode.ToString() ?? "Unknown issue";
+            var outcome = result.Exception.Message ?? result.Result.StatusCode.ToString() ?? "unknown";
 
-            logger.LogWarning($"Retry number {retryCount}, was delayed by: {timespan}. Reason: {reason}: Context: {context.OperationKey}");
+            logger.LogWarning($"Response {outcome}, sleep duration: {duration}, on attempt {attempt}: Operation Key {context.OperationKey} ");   
+
         });
     }
 
@@ -52,25 +98,24 @@ public static class HttpClientExtensions
     {
         return HttpPolicyExtensions
         .HandleTransientHttpError()
-        .OrResult(t => t.StatusCode == HttpStatusCode.TooManyRequests)
+        .OrResult(i => i.StatusCode == HttpStatusCode.TooManyRequests)
         .CircuitBreakerAsync(handledEventsAllowedBeforeBreaking: 3, 
-        durationOfBreak: TimeSpan.FromSeconds(30), 
-        onBreak: (outcome, duration, context) =>
+        durationOfBreak: TimeSpan.FromSeconds(30),
+        onBreak: (result,duration,context) =>
         {
-            var reason = outcome.Exception.Message ?? outcome.Result.StatusCode.ToString() ?? "unknown";
-
-            logger.LogWarning("Cicuit has reached the maxmimum limit and will be open for {duration}. Reason for cause: {reason} - Context : {context}",
-            duration,
-            reason,
+            var outcome = result.Exception.Message ?? result.Result.StatusCode.ToString() ?? "unknown";
+            logger.LogWarning("Circuit is now taking a break for {duration}, as failed to meet expected standards: Reason: {outcome} : operation key {context}", 
+            duration, 
+            outcome,
             context.OperationKey);
-            
-        },onReset: context =>
+        }, 
+        onReset: context => 
         {
-            logger.LogWarning("Circuit has now closed and is taking further requests {context}", context);
+            logger.LogWarning("Circuit has now closed and is taking further requests {context}",context);
             
         }, onHalfOpen: () =>
         {
-            logger.LogInformation("Circuit is going through a testing process to see how requests are being handled");
+            logger.LogWarning("Circuit is going through a testing process to determine how requests are being handled.");
         });
     }
 
@@ -78,11 +123,6 @@ public static class HttpClientExtensions
     {
         var retry = AddRetryPolicy(logger);
         var circuit = CircuitBreakerAsync(logger);
-
-        var policy = Policy.Handle<HttpRequestException>()
-        .OrResult<HttpResponseMessage>(t => t.StatusCode == HttpStatusCode.TooManyRequests)
-        .WaitAndRetryAsync(retryCount: 3, sleepDurationProvider: attempt => TimeSpan.FromSeconds(Math.Pow(3, attempt)));
-
 
         return Policy.WrapAsync(circuit, retry);
     }

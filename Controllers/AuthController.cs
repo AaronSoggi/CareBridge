@@ -48,7 +48,14 @@ public class AuthController : Controller
             return View(dto);
         }
 
-        var result = await _signInManager.PasswordSignInAsync(dto.Email, dto.Password, false, false );
+        var result = await _signInManager.PasswordSignInAsync(dto.Email, dto.Password, isPersistent: dto.RememberMe, lockoutOnFailure: true );
+
+        if (result.IsLockedOut)
+        {
+            _logger.LogWarning("Unable to log user in as they have been locked out for too many failed login attempts");
+            ModelState.AddModelError("", $"User has been locked out, please try again later");  
+            return View(dto); 
+        }
 
         if (!result.Succeeded)
         {

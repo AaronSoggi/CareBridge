@@ -5,5 +5,5 @@ namespace MediApp.Services;
 
 public interface IPatientService
 {
-    Task<List<PatientInfoDto>> GetPatientInfo();
+    Task<List<PatientDto>> GetPatientsAsync(int pageNumber, int pageSize = 10);
 }

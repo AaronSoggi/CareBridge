@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using MediApp.Identity;
+using System.Reflection.Metadata.Ecma335;
 
 
 namespace MediApp.Services;
@@ -23,63 +24,63 @@ public class DoctorService : IDoctorService
         _logger = logger;
     }
 
+    //VerifyDoctorAsync method
+
     public async Task<ServiceResult> VerifyDoctorAsync(string userId)
     {
         try
         {
             var user = await _dbContext.Users.FirstOrDefaultAsync(i => i.Id == userId);
 
-        if(user == null)
-        {
-            _logger.LogWarning("Unable to fetch user from the database");
-            return ServiceResult.Missing("Doctor cannot be found");
-        }
+             if(user == null)
+            {
+                _logger.LogWarning("User {Userid} could not be found in the system", userId);
+                return ServiceResult.Missing("User could not be found");
+            }
 
-        //check if the user is a doctor
-        var IsDoctor = await _userManager.IsInRoleAsync(user, Roles.Doctor);
+            var isDoctor = await _userManager.IsInRoleAsync(user, Roles.Doctor);
 
-        if (!IsDoctor)
-        {
-            _logger.LogWarning("Unable to complete request as user is not a doctor");
-            return ServiceResult.Fail("User is not a doctor");
-        }
+            if (!isDoctor)
+            {
+                _logger.LogWarning("The user you are trying to verify is not a doctor");
+                return ServiceResult.Fail("User is not a doctor");
+            }
 
-        // fetching claims
-        var existingClaims = await _userManager.GetClaimsAsync(user);
+            // if user is a doctor then we want to access what claims they currently have
 
-        // checking if claims contain IsVerified
-        var IsVerifiedClaim = existingClaims.FirstOrDefault(i => i.Type == "IsVerified");
+            var claims = await _userManager.GetClaimsAsync(user);
+            var existing = claims.FirstOrDefault(i => i.Type == "IsVerified" && i.Value == "false");
 
-        IdentityResult result;
+            IdentityResult result;
 
-        if(IsVerifiedClaim == null)
-        {
-            result = await _userManager.AddClaimAsync(user, new Claim("IsVerified", "true"));
-        } 
-        else if(IsVerifiedClaim.Value == "false")
-        {
-            result = await _userManager.
-            ReplaceClaimAsync(user, IsVerifiedClaim, 
-            new Claim("IsVerified", "true"));
-        }
-        else
-        {
-            return ServiceResult.Fail("Doctor is already verified");
-        }
+            if(existing != null)
+            {
+                result =  await _userManager.ReplaceClaimAsync(user, existing, new Claim("IsVerfified", "true"));
+            }
+            else
+            {
+                _logger.LogInformation("Doctor has already been verified");
+                return ServiceResult.Fail("Doctor has already been verified");
+            }
 
-        if (!result.Succeeded)
-        {
-            var errors = string.Join(",", result.Errors.Select(e => e.Description));
-            _logger.LogWarning("Something went wrong when attempting to verify the doctor: {userId} {errors}", user.Id, errors);
-            return ServiceResult.Fail("Something went wrong during the verification process");
-        }
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(",", result.Errors.Select(i => i.Description));
+                _logger.LogWarning($"something went wrong whilst trying to verify the doctor {userId}: {errors}", userId, errors);
+                return ServiceResult.Fail("Doctor could not be verified");
+            }
 
-        return ServiceResult.Ok("Doctor has been verified succesfully");
+            // Claims live in the auth cookie — bump the stamp so the doctor's
+            // existing cookie is rejected and reissued with the new claim.
+            await _userManager.UpdateSecurityStampAsync(user);
+
+            return ServiceResult.Ok("Doctor has been verified succesfully");
+ 
         }
         catch(Exception ex)
         {
-            _logger.LogError(ex, "Something went wrong when attempting to verify doctor");
-            return ServiceResult.Missing("Something went wrong, failed to verify doctor");
-        }
+            _logger.LogError($"Unfortunately something went wrong whilst trying to verify the doctor, please try again {ex.Message}");
+            return ServiceResult.Fail("Something went wrong during the verfication process.");
+        }   
     }
 }

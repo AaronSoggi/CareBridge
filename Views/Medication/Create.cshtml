@@ -3,10 +3,12 @@
 
 <form method="post" asp-action="Create" asp-controller="Medication">
 @Html.AntiForgeryToken()
+@Html.ValidationSummary(true, "", new {@class = "text-danger"})
 
 <div>
     <label asp-for="Name"></label>
     <input class="form-field" asp-for="Name" />
+    @Html.ValidationMessage("Name", "", new{@class= "text-danger" })
 </div>
 
 <div>
@@ -17,6 +19,7 @@
 <div>
     <label asp-for="Instructions"></label>
     <input class="form-field" asp-for="Instructions" />
+    @Html.ValidationMessage("Instructions", "", new{@class = "text-danger"})
 </div>
 
 <div>

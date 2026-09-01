@@ -1,10 +1,11 @@
 using System.Data;
 using FluentValidation;
+using MediApp.DTOs;
 using MediApp.Models;
 
 namespace MediApp.Validators;
 
-public class MedicationValidator : AbstractValidator<Medication>
+public class MedicationValidator : AbstractValidator<CreateMedicationDto>
 {
     public MedicationValidator()
     {
